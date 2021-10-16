@@ -11,12 +11,20 @@ export default function AuthContextProvider({ children }) {
     const [user, setUser] = useState(null);
     const [authorized, setAuthorized] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [validationError, setValidationError] = useState("");
+
+    // showing error pop
+    function showError(error) {
+        setValidationError(error);
+        setTimeout(() => {
+            setValidationError("");
+        }, 2000);
+    }
 
     // mantendo usuario
     useEffect(() => {
         const user = JSON.parse(sessionStorage.getItem("user"));
         if (!user) {
-            history.push("/login");
             return;
         }
 
@@ -41,8 +49,9 @@ export default function AuthContextProvider({ children }) {
                 history.push("/home");
             }
         } catch (err) {
-            console.log(err.response.data.error);
+            showError(err.response.data.error);
             setLoading(false);
+            console.error(err.response.data);
             return;
         }
     }
@@ -50,7 +59,7 @@ export default function AuthContextProvider({ children }) {
     // logout
     async function handleLogout() {
         // eslint-disable-next-line no-restricted-globals
-        const confirmLogout = confirm("You sure u want logou?");
+        const confirmLogout = confirm("You sure u want logout?");
         if (!confirmLogout) {
             return;
         }
@@ -62,9 +71,33 @@ export default function AuthContextProvider({ children }) {
         history.push("/login");
     }
 
+    // register
+    async function handleRegister(credentials) {
+        try {
+            const { data } = await api.post("/register", credentials);
+            if (data) {
+                const { email, password } = credentials;
+                await handleLogin({ email, password });
+            }
+        } catch (err) {
+            showError(err.response.data.error);
+            console.error(err.response.data);
+            return;
+        }
+    }
+
     return (
         <AuthContext.Provider
-            value={{ user, loading, authorized, handleLogin, handleLogout }}
+            value={{
+                user,
+                loading,
+                validationError,
+                setValidationError,
+                authorized,
+                handleLogin,
+                handleLogout,
+                handleRegister,
+            }}
         >
             {children}
         </AuthContext.Provider>

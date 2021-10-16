@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import AuthContextProvider from "./contexts/authContext";
 import Routes from "./routes";
+import { GlobalStyles } from "./styles/GlobalStyles";
 
 export default function App() {
     return (
@@ -9,6 +10,8 @@ export default function App() {
             <AuthContextProvider>
                 <Routes />
             </AuthContextProvider>
+
+            <GlobalStyles />
         </BrowserRouter>
     );
 }
