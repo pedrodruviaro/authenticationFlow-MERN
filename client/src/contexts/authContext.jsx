@@ -12,6 +12,7 @@ export default function AuthContextProvider({ children }) {
     const [authorized, setAuthorized] = useState(false);
     const [loading, setLoading] = useState(true);
 
+    // mantendo usuario
     useEffect(() => {
         const user = JSON.parse(sessionStorage.getItem("user"));
         if (!user) {
@@ -19,8 +20,6 @@ export default function AuthContextProvider({ children }) {
             return;
         }
 
-        console.log("effect");
-        console.log(user);
         setUser(user);
         setAuthorized(true);
         setLoading(false);
@@ -28,6 +27,7 @@ export default function AuthContextProvider({ children }) {
         history.push(location.pathname);
     }, [history, location.pathname]);
 
+    // login
     async function handleLogin(credentials) {
         try {
             const { data } = await api.post("/login", credentials);
@@ -47,9 +47,24 @@ export default function AuthContextProvider({ children }) {
         }
     }
 
+    // logout
+    async function handleLogout() {
+        // eslint-disable-next-line no-restricted-globals
+        const confirmLogout = confirm("You sure u want logou?");
+        if (!confirmLogout) {
+            return;
+        }
+
+        sessionStorage.removeItem("user");
+        api.defaults.headers.authorization = undefined;
+        setUser(null);
+        setAuthorized(false);
+        history.push("/login");
+    }
+
     return (
         <AuthContext.Provider
-            value={{ user, loading, authorized, handleLogin }}
+            value={{ user, loading, authorized, handleLogin, handleLogout }}
         >
             {children}
         </AuthContext.Provider>

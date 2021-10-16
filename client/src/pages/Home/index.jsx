@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { AuthContext } from "../../contexts/authContext";
 
 export default function Idex() {
-    const { user, loading } = useContext(AuthContext);
+    const { user, loading, handleLogout } = useContext(AuthContext);
 
     if (loading) {
         return <h1>Loading...</h1>;
@@ -14,6 +14,7 @@ export default function Idex() {
             <h2>username: {user.username}</h2>
             <h2>email: {user.email}</h2>
             <h2>token {user.token}</h2>
+            <button onClick={handleLogout}>Logout</button>
         </div>
     );
 }
